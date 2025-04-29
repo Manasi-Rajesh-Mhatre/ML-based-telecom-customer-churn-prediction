@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Telecom Customer Churn Prediction</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 70%;
+            margin: auto;
+            overflow: hidden;
+            padding: 30px;
+            background: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            margin-top: 30px;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .help-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .help-button:hover {
+            background-color: #0056b3;
+        }
+        .overlay {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.6);
+        }
+        .overlay-content {
+            background-color: #fff;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 700px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.3);
+        }
+        .close-btn {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close-btn:hover {
+            color: #000;
+        }
+        form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .form-section {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"], input[type="number"], select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .button-green {
+            grid-column: span 2;
+            padding: 12px;
+            background-color: #28a745;
+            border: none;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        .button-green:hover {
+            background-color: #218838;
+        }
+        #prediction-container {
+            grid-column: span 2;
+            text-align: center;
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+        }
+        .churn {
+            color: red;
+            font-weight: bold;
+            font-size: 24px;
+        }
+        .no-churn {
+            color: green;
+            font-weight: bold;
+            font-size: 24px;
+        }
+        .confidence {
+            font-size: 18px;
+            margin-top: 10px;
+        }
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+        @media (max-width: 768px) {
+            .container {
+                width: 90%;
+            }
+            form {
+                grid-template-columns: 1fr;
+            }
+            .button-green {
+                grid-column: span 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button class="help-button" onclick="document.getElementById('helpOverlay').style.display='block'">Help</button>
+        <h1>Telecom Customer Churn Prediction</h1>
+        <form action="/predict" method="post">
+            <div class="form-section">
+                <label for="SeniorCitizen">Senior Citizen:</label>
+                <select name="SeniorCitizen" id="SeniorCitizen" required>
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
+                </select>
+            </div>
+
+            <div class="form-section">
+                <label for="Partner">Partner:</label>
+                <select name="Partner" id="Partner" required>
+                    <option value="no">No</option>
+                    <option value="yes">Yes</option>
+                </select>
+            </div>
+
+            <div class="form-section">
+                <label for="Dependents">Dependents:</label>
+                <select name="Dependents" id="Dependents" required>
+                    <option value="no">No</option>
+                    <option value="yes">Yes</option>
+                </select>
+            </div>
+
+            <div class="form-section">
+                <label for="tenure">Tenure (months):</label>
+                <input type="number" name="tenure" id="tenure" min="0" max="100" required>
+            </div>
+            <div class="form-section">
+                <label for="OnlineSecurity">Online Security:</label>
+                <select name="OnlineSecurity" id="OnlineSecurity" required>
+                    <option value="no">No</option>
+                    <option value="yes">Yes</option>
+                </select>
+            </div>
+            <div class="form-section">
+                <label for="OnlineBackup">Online Backup:</label>
+                <select name="OnlineBackup" id="OnlineBackup" required>
+                    <option value="no">No</option>
+                    <option value="yes">Yes</option>
+                </select>
+            </div>
+
+            <div class="form-section">
+                <label for="DeviceProtection">Device Protection:</label>
+                <select name="DeviceProtection" id="DeviceProtection" required>
+                    <option value="no">No</option>
+                    <option value="yes">Yes</option>
+                </select>
+            </div>
+            <div class="form-section">
+                <label for="TechSupport">Tech Support:</label>
+                <select name="TechSupport" id="TechSupport" required>
+                    <option value="no">No</option>
+                    <option value="yes">Yes</option>
+                </select>
+            </div>     
+            <div class="form-section">
+                <label for="Contract">Contract Type:</label>
+                <select name="Contract" id="Contract" required>
+                    <option value="month-to-month">Month-to-month</option>
+                    <option value="one year">One year</option>
+                    <option value="two year">Two year</option>
+                </select>
+            </div>
+
+            <div class="form-section">
+                <label for="PaperlessBilling">Paperless Billing:</label>
+                <select name="PaperlessBilling" id="PaperlessBilling" required>
+                    <option value="no">No</option>
+                    <option value="yes">Yes</option>
+                </select>
+            </div>
+
+            <div class="form-section">
+                <label for="PaymentMethod">Payment Method:</label>
+                <select name="PaymentMethod" id="PaymentMethod" required>
+                    <option value="electronic check">Electronic check</option>
+                    <option value="mailed check">Mailed check</option>
+                    <option value="bank transfer (automatic)">Bank transfer (automatic)</option>
+                    <option value="credit card (automatic)">Credit card (automatic)</option>
+                </select>
+            </div>
+
+            <div class="form-section">
+                <label for="MonthlyCharges">Monthly Charges ($):</label>
+                <input type="number" name="MonthlyCharges" id="MonthlyCharges" min="0" step="0.01" required>
+            </div>
+
+            <div class="form-section">
+                <label for="TotalCharges">Total Charges ($):</label>
+                <input type="number" name="TotalCharges" id="TotalCharges" min="0" step="0.01" required>
+            </div>       
+
+            <input type="submit" value="Predict Churn" class="button-green">
+
+            <div id="prediction-container">
+                {% if prediction == 1 %}
+                    <div class="churn">This customer is likely to churn!</div>
+                    <div class="confidence">Confidence: {{ confidence }}</div>
+                {% elif prediction == 0 %}
+                    <div class="no-churn">This customer is likely to stay!</div>
+                    <div class="confidence">Confidence: {{ confidence }}</div>
+                {% endif %}
+                {% if error %}
+                    <div class="error">Error: {{ error }}</div>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+
+    <div id="helpOverlay" class="overlay">
+        <div class="overlay-content">
+            <span class="close-btn" onclick="document.getElementById('helpOverlay').style.display='none'">&times;</span>
+            <h2>Form Field Descriptions</h2>
+            <ul>
+                <li><strong>Senior Citizen</strong>: Whether the customer is a senior citizen (Yes = 1, No = 0).</li>
+                <li><strong>Partner</strong>: Whether the customer has a partner.</li>
+                <li><strong>Dependents</strong>: Whether the customer has dependents (e.g., children, family).</li>
+                <li><strong>Tenure</strong>: Number of months the customer has stayed with the company.</li>
+                <li><strong>Online Security</strong>: Whether the customer has online security services enabled.</li>
+                <li><strong>Online Backup</strong>: Whether the customer has opted for online backup services.</li>
+                <li><strong>Device Protection</strong>: Whether the customer has device protection service.</li>
+                <li><strong>Tech Support</strong>: Whether the customer has access to technical support.</li>
+                <li><strong>Contract Type</strong>: Type of contract - month-to-month, one year, or two years.</li>
+                <li><strong>Paperless Billing</strong>: Whether the customer uses paperless billing.</li>
+                <li><strong>Payment Method</strong>: Method used by the customer to pay bills.</li>
+                <li><strong>Monthly Charges</strong>: The amount charged to the customer monthly.</li>
+                <li><strong>Total Charges</strong>: Total charges the customer has paid to date.</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
