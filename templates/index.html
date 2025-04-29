@@ -113,6 +113,43 @@
             padding: 15px;
             border-radius: 4px;
         }
+        /* Add to your existing styles */
+.cluster-info {
+    grid-column: span 2;
+    margin-top: 20px;
+    padding: 20px;
+    border-radius: 8px;
+    background-color: #fff8f8;
+    border-left: 5px solid #dc3545;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.cluster-header {
+    font-weight: bold;
+    color: #dc3545;
+    margin-bottom: 10px;
+    font-size: 18px;
+}
+.cluster-no {
+    font-size: 8px;
+    text-align: right;
+}
+
+.cluster-reason {
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+.cluster-reason strong {
+    color: #333;
+}
+
+.recommendation {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #f0f8ff;
+    border-left: 3px solid #007bff;
+}
         .churn {
             color: red;
             font-weight: bold;
@@ -245,18 +282,31 @@
 
             <input type="submit" value="Predict Churn" class="button-green">
 
-            <div id="prediction-container">
-                {% if prediction == 1 %}
-                    <div class="churn">This customer is likely to churn!</div>
-                    <div class="confidence">Confidence: {{ confidence }}</div>
-                {% elif prediction == 0 %}
-                    <div class="no-churn">This customer is likely to stay!</div>
-                    <div class="confidence">Confidence: {{ confidence }}</div>
-                {% endif %}
-                {% if error %}
-                    <div class="error">Error: {{ error }}</div>
-                {% endif %}
+            <!-- Add this to your existing HTML file, within the prediction-container -->
+<div id="prediction-container">
+    {% if prediction == 1 %}
+        <div class="churn">This customer is likely to churn!</div>
+        <div class="confidence">Confidence: {{ confidence }}</div>
+        {% if cluster_info %}
+            <div class="cluster-info">
+                <div class="cluster-header">-: Customer Profile :-</div>
+                <div class="cluster-reason">
+                    <p><strong>Analysis:</strong> {{ cluster_info.reason }}</p>
+                    {% if cluster_info.recommendation %}
+                    <p><strong>Recommended Action:</strong> {{ cluster_info.recommendation }}</p>
+                    {% endif %}
+                </div>
+                <div class="cluster-no">Cluster - {{ cluster_info.cluster }}</div>
             </div>
+        {% endif %}
+    {% elif prediction == 0 %}
+        <div class="no-churn">This customer is likely to stay!</div>
+        <div class="confidence">Confidence: {{ confidence }}</div>
+    {% endif %}
+    {% if error %}
+        <div class="error">Error: {{ error }}</div>
+    {% endif %}
+</div>
         </form>
     </div>
 
